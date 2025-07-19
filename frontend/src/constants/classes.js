@@ -152,7 +152,6 @@ class Player extends Sprite {
     attack(context) {
         const now = Date.now()
         if (now - this.lastAttackTime < 400) {
-            console.log("poop")
             return
         }
 

@@ -12,7 +12,7 @@ export default function CanvasComp() {
   const {healthBoost, speedBoost, jumpBoost} = location.state || {}
 
   const [enemyHealth, setEnemyHealth] = useState(100)
-  const [userHealth, setUserHealth] = useState(healthBoost? 100 + healthBoost: 100)
+  const [userHealth, setUserHealth] = useState(100)
   const [gameState, setGameState] = useState(true)
   const [winner, setWinner] = useState("")
   const canvasRef = useRef(null)
