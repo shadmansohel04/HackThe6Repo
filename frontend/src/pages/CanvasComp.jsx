@@ -83,7 +83,7 @@ export default function CanvasComp(){
         })
 
         const enemy = new Player({
-            position: { x: 1000, y: 200 },
+            position: { x: 800, y: 200 },
             velocity: { x: 0, y: 0 },
             color: 'red',
             canvasHeight: CANVAS_HEIGHT,
@@ -96,7 +96,7 @@ export default function CanvasComp(){
             imageSource: queen,
             framesMax: 8,
             framesHold: 5,
-            jump: -20
+            jump: -20,
         })
 
         const userPlayer = new Player({
@@ -111,7 +111,7 @@ export default function CanvasComp(){
             scaleX: 2,
             scaleY: 1,
             imageSource: medival,
-            jump: -20
+            jump: -14
         })
 
         function animate(){
@@ -129,15 +129,23 @@ export default function CanvasComp(){
             enemy.update(context)
             userPlayer.velocity.x = 0
 
+            userPlayer.switchSprite('idle')
+
             if(keys.left.pressed && userPlayer.lastKey == 'left'){
-                userPlayer.velocity.x = -4
-                userPlayer.image = userPlayer.moves.run.Image
-                userPlayer.framesMax = userPlayer.moves.run.framesMax
-                userPlayer.framesHold = userPlayer.moves.run.framesHold            
+                userPlayer.velocity.x = -6
+                userPlayer.switchSprite('run')
+                userPlayer.flip = true
             }
             else if(keys.right.pressed && userPlayer.lastKey == 'right'){
-                userPlayer.velocity.x = 4
+                userPlayer.velocity.x = 6
+                userPlayer.switchSprite('run')
+                userPlayer.flip = false
             }
+
+            if(userPlayer.velocity.y < 0){
+                userPlayer.switchSprite('jump')
+            }
+
 
             // DO THE SAME WITH ENEMY ONCE YOU LOAD THE ENEMY IN HOW TF WE GONNA DO WEBSOCKETS
 

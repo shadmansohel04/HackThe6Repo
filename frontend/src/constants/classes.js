@@ -47,7 +47,7 @@ class Sprite{
 }
 
 class Player extends Sprite{
-    constructor({position, jump, velocity, canvasHeight, canvasWidth, color, start, health, attackPower, imageSource, scaleX = 1, scaleY = 1, framesMax = 1, framesHold}){
+    constructor({flip, position, jump, velocity, canvasHeight, canvasWidth, color, start, health, attackPower, imageSource, scaleX = 1, scaleY = 1, framesMax = 1, framesHold}){
         super({
             position,
             scaleX,
@@ -72,7 +72,7 @@ class Player extends Sprite{
         this.jumping = false
         this.attackBox = {
             position: this.position,
-            width: 100,
+            width: this.moves.attack.hitbox,
             height: 50
         }
         this.color = color
@@ -80,19 +80,19 @@ class Player extends Sprite{
         this.health = health
         this.attackPower = attackPower
         this.canvasWidth = canvasWidth
+        this.flip = flip
 
         for(const sprite in this.moves){
             this.moves[sprite].Image = new Image()
             this.moves[sprite].Image.src = this.moves[sprite].source
         }
-        console.log(this.moves)
 
     }
+
     update(context){
         this.draw(context)
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
-        // HEIGHT OF FLOOR
         if(this.position.y + this.height + this.velocity.y >= this.canvasHeight - 50){
             this.velocity.y = 0
             this.jumping = false
@@ -101,13 +101,13 @@ class Player extends Sprite{
             this.velocity.y += this.gravity
         }
 
-        if(this.position.x <= 0){
+        if(this.position.x <= -150){
             this.velocity.x = 0
-            this.position.x = 0
+            this.position.x = -150
         }
-        else if(this.position.x + this.width >= this.canvasWidth){
+        else if(this.position.x + this.width >= this.canvasWidth - 80){
             this.velocity.x = 0
-            this.position.x = this.canvasWidth - this.width
+            this.position.x = this.canvasWidth - 80 - this.width
         }
 
         if(this.framesPassed < this.framesHold){
@@ -120,16 +120,85 @@ class Player extends Sprite{
             }
             else{
                 this.currentFrame = 0
+                this.switchSprite('idle', false)
             }
         }
-
     }
 
+    draw(context) {
+        context.save()
+
+        const frameWidth = this.image.width / this.framesMax
+        const drawX = this.position.x
+        const drawY = this.position.y
+
+        if (this.flip) {
+            context.translate(drawX + frameWidth * this.scaleX, drawY)
+            context.scale(-1, 1)
+        } else {
+            context.translate(drawX, drawY)
+        }
+
+        context.drawImage(
+            this.image,
+            this.currentFrame * frameWidth, // source x
+            0,                              // source y
+            frameWidth,                     // source width
+            this.image.height,     
+            0,                              
+            0,                              // destination y (after translate)
+            frameWidth * this.scaleX,       // destination width
+            this.height * this.scaleY       // destination height
+        )
+
+        context.restore()
+    }
+
+
     attack(context){
+        this.switchSprite('attack')
         this.isAttacking = true
         setTimeout(() => {
             this.isAttacking = false
          }, 100);
+    }
+
+    switchSprite(sprite, flag){
+        if(this.image === this.moves.attack.Image && flag == null){
+            return
+        }
+        switch(sprite){
+            case 'idle':
+                if(this.image !== this.moves.idle.Image){
+                    this.image = this.moves.idle.Image
+                    this.framesMax = this.moves.idle.framesMax
+                    this.framesHold = this.moves.idle.framesHold
+                }
+            break
+            case 'run':
+                if(this.image !== this.moves.run.Image){
+                    this.image = this.moves.run.Image
+                    this.framesMax = this.moves.run.framesMax
+                    this.framesHold = this.moves.run.framesHold
+                }
+            break
+            case 'jump':
+                if(this.image !== this.moves.jump.Image){
+                    this.image = this.moves.jump.Image
+                    this.framesMax = this.moves.jump.framesMax
+                    this.framesHold = this.moves.jump.framesHold
+                    this.currentFrame = 0
+                }
+            break
+            case 'attack':
+                if(this.image !== this.moves.attack.Image){
+                    this.image = this.moves.attack.Image
+                    this.framesMax = this.moves.attack.framesMax
+                    this.framesHold = this.moves.attack.framesHold
+                    this.currentFrame = 0
+                }
+            break
+        }
     }
 }
 
