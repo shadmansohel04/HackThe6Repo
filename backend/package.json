@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@google/genai": "^1.10.0",
+    "@google/generative-ai": "^0.24.1",
+    "@prisma/client": "^6.12.0",
+    "express": "^5.1.0"
+  },
+  "type": "module",
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Game",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
