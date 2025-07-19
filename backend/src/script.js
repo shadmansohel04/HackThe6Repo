@@ -16,7 +16,7 @@ function askQuestion(query) {
   });
 }
 
-async function analyzeFood(foodName, ingredients) {
+async function analyzeFood(foodName) {
   const prompt = `
 You're a food battle analyzer. Analyze the given food and return only in this JSON format:
 {
@@ -34,7 +34,6 @@ Explain nutrition and food type briefly in 'details'.
 Respond ONLY with JSON.
 
 Food name: ${foodName}
-Ingredients: ${ingredients}
 `;
 
   try {

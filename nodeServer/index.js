@@ -4,8 +4,10 @@ import cors from 'cors'
 import { connectDB } from './db/connect.js'
 import { Server } from 'socket.io'
 import http from 'http'
+import { mainRouter } from './routers/mainRouter.js'
 
-const PORT = process.env.PORT || 3000
+const SOCKETPORT = process.env.SOCKETPORT || 3000
+const SERVERPORT = process.env.SERVERPORT || 3000
 
 const app = express()
 app.use(cors())
@@ -18,6 +20,8 @@ const io = new Server(server, {
     methods: ['GET', 'POST']
   }
 })
+
+app.use('/home', mainRouter)
 
 let players = []
 
@@ -90,10 +94,14 @@ io.on('connection', (socket) => {
 
 const start = async () => {
   try {
-    // await connectDB(process.env.MONGO_URI)
-    server.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server is listening on port ${PORT}...`)
+    await connectDB(process.env.MONGO_URI)
+    server.listen(SOCKETPORT, '0.0.0.0', () => {
+      console.log(`Socket is listening on port ${SOCKETPORT}...`)
     })
+    app.listen(SERVERPORT, () =>
+      console.log(`Server is listening on port ${SERVERPORT}...`)
+    );
+
   } catch (error) {
     console.log(error)
   }

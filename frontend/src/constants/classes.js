@@ -81,6 +81,7 @@ class Player extends Sprite{
         this.attackPower = attackPower
         this.canvasWidth = canvasWidth
         this.flip = flip
+        this.lastAttackTime = 0
 
         for(const sprite in this.moves){
             this.moves[sprite].Image = new Image()
@@ -154,8 +155,14 @@ class Player extends Sprite{
         context.restore()
     }
 
-
     attack(context){
+        const now = Date.now();
+        if (now - this.lastAttackTime < 400){
+            console.log("poop")
+            return
+        };
+        
+        this.lastAttackTime = now;
         this.switchSprite('attack')
         this.isAttacking = true
         setTimeout(() => {
