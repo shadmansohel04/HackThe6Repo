@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../constants/canvasInfo"
 import { Sprite, Player } from "../constants/classes"
 import { keys } from "../constants/canvasInfo"
-import diningImage from "../assets/diningFighter.png"
+import backgroundIMG from "../assets/background.png"
 import fireSpriteImg from "../assets/fire.png"
 import { queen, medival } from "../constants/images"
 import { io } from "socket.io-client"
@@ -36,12 +36,12 @@ export default function CanvasComp() {
     context.fillRect(0, 0, canvas.width, canvas.height)
 
     const background = new Sprite({
-      position: { x: -200, y: 0 },
-      imageSource: diningImage,
+      position: { x: -200, y: -200 },
+      imageSource: backgroundIMG,
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
-      scaleX: 1.4,
-      scaleY: 1.1,
+      scaleX: 1,
+      scaleY: 1.5,
     })
 
     const fireSprites = [
@@ -59,6 +59,10 @@ export default function CanvasComp() {
       context.fillRect(0, 0, canvas.width, canvas.height)
 
       background.update(context)
+      context.fillStyle = 'rgba(2, 43, 1, 0.5)'; // Black with 50% opacity
+      context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+
       fireSprites.forEach(sprite => sprite.update(context))
 
       if (userPlayer) {
