@@ -15,6 +15,12 @@ const S3 = new AWS.S3({
 
 const ai = new GoogleGenAI({ apiKey });
 
+const normalize = (obj)=>{
+    obj.health = Math.floor(obj.health/50 * 5)
+    obj.jump = Math.floor(obj.health/50 * 3)
+    obj.jump = Math.floor(obj.health/50 * 3)
+}
+
 async function analyzeFood(foodName) {
   const prompt = `
 You're a food battle analyzer. Analyze the given food and return only in this JSON format:
@@ -117,8 +123,10 @@ const createFood = async (req, res) => {
                 const final = `{${objString}}`
                 fromGeminiJSON = await JSON.parse(final)
             } catch (error) {
-                fromGeminiJSON = {name: parsedJSON.foodName, details: "", health: 5, jump: 5, speed: 5}
+                fromGeminiJSON = {name: parsedJSON.foodName, details: "", health: 0, jump: 0, speed: 0}
             }
+
+            fromGeminiJSON = normalize(fromGeminiJSON)
 
             const fileStream = fs.createReadStream(file.path);
             

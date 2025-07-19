@@ -42,7 +42,7 @@ export const queen = {
         source: QueenAttack,
         framesMax: 4,
         framesHold: 2,
-        hitbox: 160
+        hitbox: 200
     },
     jump: {
         source: QueenJump,
@@ -66,7 +66,7 @@ export const hoodie = {
         source: hoodieAttack,
         framesMax: 8,
         framesHold: 2,
-        hitbox: 60
+        hitbox: 200
     },
     jump: {
         source: hoodieJump,
@@ -89,7 +89,7 @@ export const hoodie2 = {
         source: hoodieAttack2,
         framesMax: 8,
         framesHold: 2,
-        hitbox: 60
+        hitbox: 200
     },
     jump: {
         source: hoodieJump2,

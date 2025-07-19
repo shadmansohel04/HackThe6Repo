@@ -41,7 +41,7 @@ export default function UserDash() {
             <h1>Welcome, {user.name}!</h1>
             <button onClick={()=>{
                 navigate("/game",{state:{
-                    healthBoost: 10,
+                    healthBoost: 13,
                     speedBoost: 10,
                     jumpBoost: 10
                 }})

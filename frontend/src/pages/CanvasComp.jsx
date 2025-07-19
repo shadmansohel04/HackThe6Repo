@@ -89,6 +89,7 @@ export default function CanvasComp() {
           health: userPlayer.health,
           isAttacking: userPlayer.isAttacking,
           flip: userPlayer.flip,
+          attackPower: userPlayer.attackPower
         })
       }
 
@@ -125,7 +126,7 @@ export default function CanvasComp() {
         color: role === "player1" ? "blue" : "red",
         canvasHeight: CANVAS_HEIGHT,
         start: role === "player1" ? "left" : "right",
-        attackPower: 10,
+        attackPower: healthBoost? 10 + healthBoost: 10,
         health: 100,
         canvasWidth: CANVAS_WIDTH,
         scaleX: 5,
@@ -160,6 +161,7 @@ export default function CanvasComp() {
       enemyPlayer.health = data.health;
       enemyPlayer.flip = data.flip;
       enemyPlayer.isAttacking = data.isAttacking;
+      enemyPlayer.attackPower = data.attackPower
       setEnemyHealth(data.health);
 
       enemyPlayer.velocity.x = data.velocity.x;
@@ -207,7 +209,7 @@ export default function CanvasComp() {
         attackY <= userY + userH;
 
       if (horizontallyAligned && verticallyAligned && enemyData.isAttacking) {
-        userPlayer.health = Math.max(userPlayer.health - 5, 0)
+        userPlayer.health = Math.max(userPlayer.health - enemyPlayer.attackPower, 0)
         setUserHealth(userPlayer.health);
         flashTimer.current = 10
       }
@@ -247,7 +249,7 @@ export default function CanvasComp() {
               position: userPlayer.position,
               width: userPlayer.width,
               height: userPlayer.height,
-              attackBox: userPlayer.attackBox
+              attackBox: userPlayer.attackBox,
             }
           })
           break
