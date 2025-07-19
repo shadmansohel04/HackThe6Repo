@@ -1,6 +1,7 @@
 
 const getFoods = async (req, res) => {
     try {
+        // console.log(req.user.sub)
         return res.status(200).json({
             success: true,
             message: 'Food uploaded successfully.',
@@ -13,3 +14,5 @@ const getFoods = async (req, res) => {
         })
     }
 }
+
+export {getFoods}

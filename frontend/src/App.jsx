@@ -19,9 +19,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<CanvasComp />} />
+        <Route index element={<HomePage />} />
         <Route path="/userDash" element={<UserDash />} />
-        {/* <Route path="/game" element={<CanvasComp />} /> */}
+        <Route path="/game" element={<CanvasComp />} />
       </Routes>
     </BrowserRouter>
   );

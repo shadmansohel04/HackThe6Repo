@@ -3,19 +3,27 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../constants/canvasInfo"
 import { Sprite, Player } from "../constants/classes"
 import { keys } from "../constants/canvasInfo"
 import backgroundIMG from "../assets/background.png"
-import fireSpriteImg from "../assets/fire.png"
-import { queen, medival } from "../constants/images"
+import { hoodie, hoodie2 } from "../constants/images"
 import { io } from "socket.io-client"
-
-const socket = io("http://10.33.41.210:3000")
+import { useLocation } from "react-router-dom";
 
 export default function CanvasComp() {
+  const location = useLocation();
+  const {healthBoost, speedBoost, jumpBoost} = location.state || {}
+
   const [enemyHealth, setEnemyHealth] = useState(100)
-  const [userHealth, setUserHealth] = useState(100)
+  const [userHealth, setUserHealth] = useState(healthBoost? 100 + healthBoost: 100)
   const [gameState, setGameState] = useState(true)
   const [winner, setWinner] = useState("")
   const canvasRef = useRef(null)
   const [playerNumber, setPlayerNumber] = useState("")
+  const flashTimer = useRef(0)
+  const socket = useRef(null)
+
+  useEffect(()=>{
+    const tempSocket = io("http://10.33.41.210:3000")
+    socket.current = tempSocket
+  }, [])
 
   useEffect(() => {
     if (enemyHealth <= 0) {
@@ -36,19 +44,14 @@ export default function CanvasComp() {
     context.fillRect(0, 0, canvas.width, canvas.height)
 
     const background = new Sprite({
-      position: { x: -200, y: -200 },
+      position: { x: -200, y: 0 },
       imageSource: backgroundIMG,
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
       scaleX: 1,
-      scaleY: 1.5,
+      scaleY: 1.3,
     })
 
-    const fireSprites = [
-      new Sprite({ position: { x: 150, y: 10 }, velocity: { x: 0, y: 0 }, width: 100, height: 100, imageSource: fireSpriteImg, scaleX: 0.5, framesMax: 4, framesHold: 5 }),
-      new Sprite({ position: { x: -44, y: 10 }, velocity: { x: 0, y: 0 }, width: 100, height: 100, imageSource: fireSpriteImg, scaleX: 0.5, framesMax: 4, framesHold: 5 }),
-      new Sprite({ position: { x: 1055, y: 10 }, velocity: { x: 0, y: 0 }, width: 100, height: 100, imageSource: fireSpriteImg, scaleX: 0.5, framesMax: 4, framesHold: 5 }),
-    ]
 
     let userPlayer = null
     let enemyPlayer = null
@@ -59,11 +62,6 @@ export default function CanvasComp() {
       context.fillRect(0, 0, canvas.width, canvas.height)
 
       background.update(context)
-      context.fillStyle = 'rgba(2, 43, 1, 0.5)'; // Black with 50% opacity
-      context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-
-      fireSprites.forEach(sprite => sprite.update(context))
 
       if (userPlayer) {
         userPlayer.update(context)
@@ -72,11 +70,11 @@ export default function CanvasComp() {
         userPlayer.switchSprite("idle")
 
         if (keys.left.pressed && userPlayer.lastKey === "left") {
-          userPlayer.velocity.x = -6
+          userPlayer.velocity.x = speedBoost? -6 - speedBoost : -6
           userPlayer.switchSprite("run")
           userPlayer.flip = true
         } else if (keys.right.pressed && userPlayer.lastKey === "right") {
-          userPlayer.velocity.x = 6
+          userPlayer.velocity.x = speedBoost? 6 + speedBoost : 6
           userPlayer.switchSprite("run")
           userPlayer.flip = false
         }
@@ -85,7 +83,7 @@ export default function CanvasComp() {
           userPlayer.switchSprite("jump")
         }
 
-        socket.emit("update-player", {
+        socket.current.emit("update-player", {
           position: userPlayer.position,
           velocity: userPlayer.velocity,
           health: userPlayer.health,
@@ -94,12 +92,32 @@ export default function CanvasComp() {
         })
       }
 
+    if (flashTimer.current > 0) {
+      const gradient = context.createRadialGradient(
+        canvas.width / 2,
+        canvas.height / 2,
+        100,
+        canvas.width / 2,
+        canvas.height / 2,
+        Math.max(canvas.width, canvas.height) / 1.2
+      )
+
+      gradient.addColorStop(0, "rgba(255, 0, 0, 0)")
+      gradient.addColorStop(0.7, "rgba(255, 0, 0, 0.4)")
+      gradient.addColorStop(1, "rgba(255, 0, 0, 0.5)")
+
+      context.fillStyle = gradient
+      context.fillRect(0, 0, canvas.width, canvas.height)
+
+      flashTimer.current--
+    }
+
       if (enemyPlayer) {
         enemyPlayer.update(context)
       }
     }
 
-    socket.on("init", ({ role, position }) => {
+    socket.current.on("init", ({ role, position }) => {
       setPlayerNumber(role)
       userPlayer = new Player({
         position: position,
@@ -110,14 +128,14 @@ export default function CanvasComp() {
         attackPower: 10,
         health: 100,
         canvasWidth: CANVAS_WIDTH,
-        scaleX: 2,
-        scaleY: 1,
-        imageSource: role === "player1" ? medival : queen,
-        jump: role === "player1" ? -14 : -20,
+        scaleX: 5,
+        scaleY: 0.6,
+        imageSource: role === "player1" ? hoodie : hoodie2,
+        jump: jumpBoost? -14 - jumpBoost: -14,
       })
     })
 
-    socket.on("player-joined", ({ role, position }) => {
+    socket.current.on("player-joined", ({ role, position }) => {
       enemyPlayer = new Player({
         position,
         velocity: { x: 0, y: 0 },
@@ -127,14 +145,14 @@ export default function CanvasComp() {
         attackPower: 10,
         health: 100,
         canvasWidth: CANVAS_WIDTH,
-        scaleX: 2,
-        scaleY: 1,
-        imageSource: role === "player1" ? medival : queen,
-        jump: role === "player1" ? -14 : -20,
+        scaleX: 5,
+        scaleY: 0.6,
+        imageSource: role === "player1" ? hoodie : hoodie2,
+        jump: -14,
       })
     })
 
-    socket.on("update-opponent", ({ data }) => {
+    socket.current.on("update-opponent", ({ data }) => {
       if (!enemyPlayer) return;
 
       enemyPlayer.position = data.position;
@@ -144,7 +162,6 @@ export default function CanvasComp() {
       enemyPlayer.isAttacking = data.isAttacking;
       setEnemyHealth(data.health);
 
-      // Handle enemy animation
       enemyPlayer.velocity.x = data.velocity.x;
 
       if (enemyPlayer.velocity.y < 0) {
@@ -160,9 +177,8 @@ export default function CanvasComp() {
       }
     });
 
-    
 
-    socket.on("opponent-attack", ({ attackBox, enemyData }) => {
+    socket.current.on("opponent-attack", ({ attackBox, enemyData }) => {
       if (!userPlayer) return;
 
       enemyPlayer.isAttacking = true;
@@ -191,14 +207,11 @@ export default function CanvasComp() {
         attackY <= userY + userH;
 
       if (horizontallyAligned && verticallyAligned && enemyData.isAttacking) {
-        console.log("You got hit!");
         userPlayer.health = Math.max(userPlayer.health - 5, 0)
         setUserHealth(userPlayer.health);
+        flashTimer.current = 10
       }
     });
-
-
-
 
     animate()
 
@@ -221,7 +234,7 @@ export default function CanvasComp() {
           break
         case " ":
           userPlayer.attack()
-          socket.emit("player-attack", {
+          socket.current.emit("player-attack", {
             attackBox: {
               x: userPlayer.attackBox.position.x,
               y: userPlayer.attackBox.position.y,
@@ -258,10 +271,10 @@ export default function CanvasComp() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
       window.removeEventListener("keyup", handleKeyUp)
-      socket.off("init")
-      socket.off("player-joined")
-      socket.off("update-opponent")
-      socket.off("opponent-attack")
+      socket.current.off("init")
+      socket.current.off("player-joined")
+      socket.current.off("update-opponent")
+      socket.current.off("opponent-attack")
     }
   }, [])
 

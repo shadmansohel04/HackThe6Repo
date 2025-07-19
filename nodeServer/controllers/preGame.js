@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import AWS from "aws-sdk"
 import { GoogleGenAI } from "@google/genai";
+import RECIPE from "../db/models/item.js"
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -82,9 +83,11 @@ const createFood = async (req, res) => {
         if (err) {
             return res.status(400).json({ success: false, message: err.message });
         }
-
         try {
-            
+            const id = req.user.sub
+            if(!id){
+                throw new Error("invalid person")
+            }
             const file = req.file;
             const { jsonData } = req.body;
 
@@ -102,33 +105,53 @@ const createFood = async (req, res) => {
             } catch (jsonErr) {
                 return res.status(400).json({ success: false, message: "Invalid JSON in jsonData." });
             }
-            console.log("start")
-            if(parsedJSON && parsedJSON.foodName){
-                console.log(parsedJSON.foodName)
-                const result = await analyzeFood(parsedJSON.foodName)
-                console.log(result)
+            if(!parsedJSON || !parsedJSON.foodName){
+                throw new Error("unable to parse")
             }
-            console.log("end")
-            // const fileStream = fs.createReadStream(file.path);
+
+            let fromGeminiJSON
+            try {
+                const result = await analyzeFood(parsedJSON.foodName)
+                let objString = result.split("{").length > 1? result.split("{")[1]: null
+                objString = objString.split("}")[0]
+                const final = `{${objString}}`
+                fromGeminiJSON = await JSON.parse(final)
+            } catch (error) {
+                fromGeminiJSON = {name: parsedJSON.foodName, details: "", health: 5, jump: 5, speed: 5}
+            }
+
+            const fileStream = fs.createReadStream(file.path);
             
             const uniqueKey = `uploads/${Date.now()}-${Math.random().toString(36).substring(2)}${path.extname(file.originalname)}`;
 
             const params = {
                 Bucket: process.env.BUCKETNAME,
                 Key: uniqueKey,
-                // Body: fileStream,
+                Body: fileStream,
                 ContentType: file.mimetype,
             };
 
 
-            // await S3.putObject(params).promise()
-            // fs.unlinkSync(file.path);
+            await S3.putObject(params).promise()
+            fs.unlinkSync(file.path);
 
             const url = `https://foodimgbuck.s3.us-east-2.amazonaws.com/${uniqueKey}`
 
+            await RECIPE.create({
+                foodName: fromGeminiJSON.name,
+                foodURL: url,
+                personID: id,
+                description: fromGeminiJSON.details,
+                health: fromGeminiJSON.health,
+                jump: fromGeminiJSON.jump,
+                speed: fromGeminiJSON.speed,
+            })
+
             return res.status(200).json({
                 success: true,
-                message: 'Food uploaded successfully.',
+                message: 'Food uploaded successfully',
+                imageURL: url,
+                details: fromGeminiJSON
             });
 
         } catch (error) {

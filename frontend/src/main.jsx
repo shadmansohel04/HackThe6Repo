@@ -12,7 +12,10 @@ root.render(
     clientId="Yum35S29OVPLsGTzSCj4TJFFfEtfPwct"
     authorizationParams={{
       redirect_uri: 'http://localhost:5173/userDash',
+      audience: "https://dev-abm2ro6war776xmm.us.auth0.com/api/v2/"
     }}
+    cacheLocation="localstorage"
+
   >
     <App />
   </Auth0Provider>
