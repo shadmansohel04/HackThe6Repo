@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
-  console.error("GEMINI_API_KEY is not set.");
+  console.error("GEMINI_API_KEY not set.");
   process.exit(1);
 }
 
