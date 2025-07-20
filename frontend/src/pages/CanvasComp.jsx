@@ -343,8 +343,8 @@ export default function CanvasComp() {
 
   return (
     <div className="gameOverScreen">
-      <h1>GAME OVER</h1>
-      <h2>{winner}</h2>
+      <h1 style={{color: 'white', fontSize: '9rem'}}>GAME OVER</h1>
+      <h2 style={{color: 'white', fontSize: '5rem'}}>{winner}</h2>
     </div>
   );
 }
