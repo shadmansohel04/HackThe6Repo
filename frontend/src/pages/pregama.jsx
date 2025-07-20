@@ -22,8 +22,10 @@ export default function PregameComp() {
         });
         const response = await raw.json();
         if (response && response.recipes) {
-          setRecipeData(response.recipes);
-          console.log(response.recipes);
+            if(response.recipes.length == 0){
+                nav("/game")
+            }
+            setRecipeData(response.recipes);
         }
       } catch (error) {
         console.log(error);
@@ -32,8 +34,31 @@ export default function PregameComp() {
     fetcher();
   }, []);
 
+  const deleter = async(personID, foodURL)=>{
+    try {
+        const token = await getAccessTokenSilently();
+        const raw = await fetch("http://10.33.41.210:8000/home/deleteRecipe",{
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                personID,
+                foodURL
+            })
+        })
+        const response = await raw.json()
+    } catch (error) {
+        console.log(error)
+    } 
+  }
+
   return (
     <>
+        <button style={{position: 'absolute', left: '10px', top: '10px'}} onClick={()=>{
+            nav("/userDash")
+        }}>Back</button>
         <button onClick={()=>{
             if(selected < 0){
                 nav("/game")
@@ -44,6 +69,7 @@ export default function PregameComp() {
                     speedBoost: recipeData[selected].speed,
                     jumpBoost: recipeData[selected].jump
                 }})
+                deleter(recipeData[selected].personID, recipeData[selected].foodURL)
             }
         }} style={{position: 'absolute', top: '10px', right: '10px'}}>{selected < 0? "Skip selection": "Confirm"}</button>
         <div className="pregamePage">

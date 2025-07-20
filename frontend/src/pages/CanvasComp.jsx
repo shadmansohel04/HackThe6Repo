@@ -5,13 +5,14 @@ import { keys } from "../constants/canvasInfo";
 import backgroundIMG from "../assets/background.png";
 import { hoodie, hoodie2 } from "../constants/images";
 import { io } from "socket.io-client";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function CanvasComp() {
   const location = useLocation();
   const { user } = useAuth0();
   const { healthBoost, speedBoost, jumpBoost } = location.state || {};
+  const nav = useNavigate()
 
   const [enemyHealth, setEnemyHealth] = useState(100);
   const [userHealth, setUserHealth] = useState(100);
@@ -296,7 +297,7 @@ export default function CanvasComp() {
       <div className="gameContainer">
         <header className="scoreBoard">
           <div>
-            <h2 style={{ color: "white", marginBottom: 0 }}>
+            <h2 style={{ color: "white", marginBottom: 0, fontFamily: "Pixelify Sans, sans-serif" }}>
               {playerNumber === "player1" ? (user?.name || "Guest") : enemyName}
             </h2>
             <progress
@@ -308,7 +309,7 @@ export default function CanvasComp() {
           </div>
 
           <div>
-            <h2 style={{ color: "white", marginBottom: 0 }}>
+            <h2 style={{ color: "white", marginBottom: 0, fontFamily: "Pixelify Sans, sans-serif" }}>
               {playerNumber === "player2" ? (user?.name || "Guest") : enemyName}
             </h2>
             <progress
@@ -324,6 +325,7 @@ export default function CanvasComp() {
           <div style={{
             display: "flex",
             justifyContent: "center",
+            flexDirection: 'column',
             alignItems: "center",
             position: "absolute",
             width: "1200px",
@@ -332,7 +334,10 @@ export default function CanvasComp() {
             bottom: 0,
             backgroundColor: "black"
           }}>
-            <h1 style={{ color: "white" }}>Waiting for player2...</h1>
+            <h1 style={{ color: "white", fontFamily: "Pixelify Sans, sans-serif" }}>Waiting for player2...</h1>
+            <button onClick={()=>{
+              nav("/userDash")
+            }}>Back</button>
           </div>
         )}
 
@@ -343,8 +348,8 @@ export default function CanvasComp() {
 
   return (
     <div className="gameOverScreen">
-      <h1 style={{color: 'white', fontSize: '9rem'}}>GAME OVER</h1>
-      <h2 style={{color: 'white', fontSize: '5rem'}}>{winner}</h2>
+      <h1 style={{color: 'white', fontSize: '9rem', fontFamily: "Pixelify Sans, sans-serif"}}>GAME OVER</h1>
+      <h2 style={{color: 'white', fontSize: '5rem', fontFamily: "Pixelify Sans, sans-serif"}}>{winner}</h2>
     </div>
   );
 }

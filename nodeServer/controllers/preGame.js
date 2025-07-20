@@ -173,4 +173,36 @@ const createFood = async (req, res) => {
     });
 };
 
-export { createFood };
+const removeFood = async (req, res) => {
+    try {
+        const { personID, foodURL } = req.body;
+
+        if (!personID || !foodURL) {
+            return res.status(400).json({ success: false, message: "personID, _id, and foodURL are required" });
+        }
+
+        const urlParts = foodURL.split('/');
+        const fileKey = urlParts[urlParts.length - 1];
+
+        const result = await RECIPE.findOneAndDelete({ personID, foodURL });
+
+        if (!result) {
+            return res.status(404).json({ success: false, message: "Food item not found" });
+        }
+
+        const params = {
+            Bucket: process.env.BUCKETNAME,
+            Key: `uploads/${fileKey}`, 
+        };
+
+        await S3.deleteObject(params).promise();
+
+        return res.status(200).json({ success: true, message: "Food item and image deleted successfully" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    }
+};
+
+export { createFood, removeFood };
