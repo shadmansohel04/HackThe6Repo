@@ -80,7 +80,7 @@ export default function CameraPage() {
         <div className="cameraPage">
             <button style={{position: 'absolute', top: '20px', right: '20px'}} onClick={()=>{nav("/userDash")}}>Back To Dash</button>
 
-            <h1>{cardData == null ? 'Upload Your Food!' : `New card: ${cardData.details.name}`}</h1>
+            <h1 style={{color: 'white'}}>{cardData == null ? 'Upload Your Food!' : `New card: ${cardData.details.name}`}</h1>
             <div className="row">
                 <div className="cameraContainer" style={{ width: cardData == null ? '70%' : '30%' }}>
                     {cardData == null?(
@@ -119,7 +119,7 @@ export default function CameraPage() {
                 <div className="rightSide">
                     {cardData == null ? (
                         <>
-                            <h3 style={{ marginBottom: '20px' }}>Enter the food name</h3>
+                            <h3 style={{ marginBottom: '20px', color:'white' }}>Enter the food name</h3>
                             <input
                                 value={name}
                                 type="text"

@@ -22,6 +22,7 @@ export default function CanvasComp() {
   const flashTimer = useRef(0);
   const socket = useRef(null);
   const [enemyName, setEnemyName] = useState("Guest");
+  const [waiting, setWaiting] = useState(true);
 
   useEffect(() => {
     const tempSocket = io("http://10.33.41.210:3000", {
@@ -75,11 +76,11 @@ export default function CanvasComp() {
         userPlayer.velocity.x = 0;
         userPlayer.switchSprite("idle");
 
-        if (keys.left.pressed && userPlayer.lastKey === "left") {
+        if (!waiting && keys.left.pressed && userPlayer.lastKey === "left") {
           userPlayer.velocity.x = speedBoost ? -6 - speedBoost : -6;
           userPlayer.switchSprite("run");
           userPlayer.flip = true;
-        } else if (keys.right.pressed && userPlayer.lastKey === "right") {
+        } else if (!waiting && keys.right.pressed && userPlayer.lastKey === "right") {
           userPlayer.velocity.x = speedBoost ? 6 + speedBoost : 6;
           userPlayer.switchSprite("run");
           userPlayer.flip = false;
@@ -160,6 +161,7 @@ export default function CanvasComp() {
       });
 
       setEnemyName(username || "Guest");
+      setWaiting(false); // opponent joined, stop waiting
     });
 
     socket.current.on("update-opponent", ({ data }) => {
@@ -227,7 +229,7 @@ export default function CanvasComp() {
     animate();
 
     const handleKeyDown = (e) => {
-      if (!userPlayer) return;
+      if (!userPlayer || waiting) return;
       switch (e.key) {
         case "ArrowLeft":
           keys.left.pressed = true;
@@ -291,12 +293,14 @@ export default function CanvasComp() {
 
   if (gameState) {
     return (
-      <div className="gameContainer">
+      <div className="gameContainer" style={{ position: "relative" }}>
         <header className="scoreBoard">
           <div>
-            <h3>{playerNumber === "player1" ? user.name : enemyName}</h3>
+            <h2 style={{ color: "white", marginBottom: 0 }}>
+              {playerNumber === "player1" ? user.name : enemyName}
+            </h2>
             <progress
-              style={{ height: "100px", width: "500px" }}
+              style={{ marginTop: 0, height: "100px", width: "500px" }}
               className="nes-progress is-success"
               value={playerNumber === "player1" ? userHealth : enemyHealth}
               max="100"
@@ -304,15 +308,38 @@ export default function CanvasComp() {
           </div>
 
           <div>
-            <h3>{playerNumber === "player2" ? user.name : enemyName}</h3>
+            <h2 style={{ color: "white", marginBottom: 0 }}>
+              {playerNumber === "player2" ? user.name : enemyName}
+            </h2>
             <progress
-              style={{ height: "100px", width: "500px" }}
+              style={{ marginTop: 0, height: "100px", width: "500px" }}
               className="nes-progress is-success"
               value={playerNumber === "player2" ? userHealth : enemyHealth}
               max="100"
             ></progress>
           </div>
         </header>
+
+        {waiting && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              color: "white",
+              padding: "2rem 3rem",
+              fontSize: "2rem",
+              borderRadius: "16px",
+              zIndex: 10,
+              textAlign: "center",
+            }}
+          >
+            Waiting for opponent to join...
+          </div>
+        )}
+
         <canvas ref={canvasRef}></canvas>
       </div>
     );

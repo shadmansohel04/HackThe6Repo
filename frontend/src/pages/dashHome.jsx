@@ -12,7 +12,7 @@ export default function GameComp(){
     if(!isAuthenticated){
         return(
             <div>
-                <h1>Please log in</h1>
+                <h1 style={{color: 'white'}}>Please log in</h1>
             </div>
         )
     }
@@ -22,7 +22,7 @@ export default function GameComp(){
             <div className="gamePage">
                 <div style={{position: 'absolute', width: '100%', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.5)'}}/>
                 <div className="left">
-                    <h1>Welcome {user.name}</h1>
+                    <h1 style={{color: 'white'}}>Welcome {user.name}</h1>
                     <img className="player1" src={P1} alt="player1" />
                 </div>
                 <div className="right">

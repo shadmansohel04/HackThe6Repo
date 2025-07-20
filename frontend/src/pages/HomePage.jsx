@@ -54,7 +54,7 @@ export default function HomePage() {
           No Login
         </button>
       </div>
-      <p>Logging in gives access to power ups based on your food!</p>
+      <p style={{color: 'white'}}>Logging in gives access to power ups based on your food!</p>
     </div>
   );
 }

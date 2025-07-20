@@ -47,7 +47,7 @@ export default function PregameComp() {
             }
         }} style={{position: 'absolute', top: '10px', right: '10px'}}>{selected < 0? "Skip selection": "Confirm"}</button>
         <div className="pregamePage">
-        <h1>Choose One Food Item</h1>
+        <h1 style={{color: 'white'}}>Choose One Food Item</h1>
         <ul className="carousel">
             {recipeData.map((each, index) => {
             return (
@@ -69,6 +69,7 @@ export default function PregameComp() {
                     <h1
                     className="tint"
                     style={{
+                        color: 'white',
                         position: "absolute",
                         bottom: "0px",
                         left: "50%",
@@ -88,6 +89,7 @@ export default function PregameComp() {
                         position: "absolute",
                         top: "0px",
                         left: "50%",
+                        color: 'white',
                         transform: "translateX(-50%)",
                     }}
                     >
