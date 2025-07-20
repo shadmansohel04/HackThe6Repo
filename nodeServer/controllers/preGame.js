@@ -15,11 +15,14 @@ const S3 = new AWS.S3({
 
 const ai = new GoogleGenAI({ apiKey });
 
-const normalize = (obj)=>{
-    obj.health = Math.floor(obj.health/50 * 5)
-    obj.jump = Math.floor(obj.health/50 * 3)
-    obj.jump = Math.floor(obj.health/50 * 3)
+const normalize = (obj) => {
+  obj.health = Math.floor(obj.health / 50 * 5);
+  obj.jump = Math.floor(obj.jump / 50 * 3);
+  obj.speed = Math.floor(obj.speed / 50 * 4);
+
+  return obj;
 }
+
 
 async function analyzeFood(foodName) {
   const prompt = `
@@ -127,6 +130,7 @@ const createFood = async (req, res) => {
             }
 
             fromGeminiJSON = normalize(fromGeminiJSON)
+            // console.log("Normalized values:", fromGeminiJSON);
 
             const fileStream = fs.createReadStream(file.path);
             

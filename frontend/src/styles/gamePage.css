@@ -1,0 +1,70 @@
+.gamePage{
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-image: url('../assets/homeBack.gif');
+    background-size: cover;
+    background-position: 50%;
+    margin: 0;
+
+}
+
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* So absolute positioning works inside */
+}
+
+.left h1 {
+  /* margin-top: 40%; */
+  font-size: 4rem;
+  padding-left: 10%;
+  z-index: 1; /* keep it above if needed */
+  font-size: 5vw;
+}
+
+.player1 {
+  position: absolute;
+  bottom: 1%;   /* Push away from bottom */
+  right: 10%;    /* Align to right */
+  width: 18vw;
+  height: 18vw;
+  z-index: 10;
+}
+
+.player2 {
+  bottom: 1%;   /* Push away from bottom */
+  position: absolute;
+  left: 10%;
+  /* transform: scale(2); */
+  width: 18vw;
+  height: 18vw;
+  z-index: 10;
+}
+
+.right{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.joinButton{
+    width: 18vw;
+    position: absolute;
+    bottom: 10%;
+    right: 3%;
+    font-size: 2vw;
+    border: solid white 2px;
+}
+
+.leftSide{
+    width: 18vw;
+    position: absolute;
+    bottom: 10%;
+    left: 3%;
+    font-size: 2vw;
+    font-weight: 600;
+}
+

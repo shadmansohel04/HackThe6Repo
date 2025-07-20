@@ -5,6 +5,7 @@ const LoginButton = () => {
 
   return (
     <button
+      style={{fontSize:'1.2vw'}}
       onClick={() =>
         loginWithRedirect({
           appState: {

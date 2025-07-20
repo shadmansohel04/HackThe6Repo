@@ -1,10 +1,16 @@
+import RECIPE from "../db/models/item.js"
 
 const getFoods = async (req, res) => {
     try {
-        // console.log(req.user.sub)
+        const userID = req.user.sub
+
+        const recipes = await RECIPE.find({
+            personID: userID
+        })
+
         return res.status(200).json({
             success: true,
-            message: 'Food uploaded successfully.',
+            recipes
         });    
     } 
     catch (error) {

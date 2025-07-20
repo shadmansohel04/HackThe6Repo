@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import { useAuth0 } from "@auth0/auth0-react";
 import UserDash from './pages/userDash';
 import CanvasComp from './pages/CanvasComp';
+import CameraPage from './pages/cameraPage';
+import GameComp from './pages/dashHome';
+import PregameComp from './pages/pregama';
 
 function App() {
   const { isLoading, error } = useAuth0();
@@ -20,8 +23,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route index element={<HomePage />} />
-        <Route path="/userDash" element={<UserDash />} />
+        {/* <Route path="/userDash" element={<UserDash />} /> */}
+        <Route path="/userDash" element={<GameComp />} />
         <Route path="/game" element={<CanvasComp />} />
+        <Route path="/cameraPage" element={<CameraPage />} />
+        <Route path="/preGame" element={<PregameComp />} />
       </Routes>
     </BrowserRouter>
   );

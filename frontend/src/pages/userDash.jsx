@@ -46,6 +46,9 @@ export default function UserDash() {
                     jumpBoost: 10
                 }})
             }}>LETS PLAY</button>
+            <button onClick={()=>{
+                navigate("/cameraPage")
+            }}>Upload</button>
         </div>
     );
 }
