@@ -1,47 +1,54 @@
-import { useEffect, useRef, useState } from "react"
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../constants/canvasInfo"
-import { Sprite, Player } from "../constants/classes"
-import { keys } from "../constants/canvasInfo"
-import backgroundIMG from "../assets/background.png"
-import { hoodie, hoodie2 } from "../constants/images"
-import { io } from "socket.io-client"
+import { useEffect, useRef, useState } from "react";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../constants/canvasInfo";
+import { Sprite, Player } from "../constants/classes";
+import { keys } from "../constants/canvasInfo";
+import backgroundIMG from "../assets/background.png";
+import { hoodie, hoodie2 } from "../constants/images";
+import { io } from "socket.io-client";
 import { useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function CanvasComp() {
   const location = useLocation();
-  const {healthBoost, speedBoost, jumpBoost} = location.state || {}
+  const { user } = useAuth0();
+  const { healthBoost, speedBoost, jumpBoost } = location.state || {};
 
-  const [enemyHealth, setEnemyHealth] = useState(100)
-  const [userHealth, setUserHealth] = useState(100)
-  const [gameState, setGameState] = useState(true)
-  const [winner, setWinner] = useState("")
-  const canvasRef = useRef(null)
-  const [playerNumber, setPlayerNumber] = useState("")
-  const flashTimer = useRef(0)
-  const socket = useRef(null)
+  const [enemyHealth, setEnemyHealth] = useState(100);
+  const [userHealth, setUserHealth] = useState(100);
+  const [gameState, setGameState] = useState(true);
+  const [winner, setWinner] = useState("");
+  const canvasRef = useRef(null);
+  const [playerNumber, setPlayerNumber] = useState("");
+  const flashTimer = useRef(0);
+  const socket = useRef(null);
+  const [enemyName, setEnemyName] = useState("Guest");
 
-  useEffect(()=>{
-    const tempSocket = io("http://10.33.41.210:3000")
-    socket.current = tempSocket
-  }, [])
+  useEffect(() => {
+    const tempSocket = io("http://10.33.41.210:3000", {
+      auth: {
+        username: user?.name || "Guest"
+      }
+    });
+    socket.current = tempSocket;
+  }, [user]);
 
   useEffect(() => {
     if (enemyHealth <= 0) {
-      setGameState(false)
-      setWinner("You Win!")
+      setGameState(false);
+      setWinner("You Win!");
     } else if (userHealth <= 0) {
-      setGameState(false)
-      setWinner("You Lose!")
+      setGameState(false);
+      setWinner("You Lose!");
     }
-  }, [enemyHealth, userHealth])
+  }, [enemyHealth, userHealth]);
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    const context = canvas.getContext("2d")
-    canvas.width = CANVAS_WIDTH
-    canvas.height = CANVAS_HEIGHT
-    context.fillStyle = "lightblue"
-    context.fillRect(0, 0, canvas.width, canvas.height)
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
+    context.fillStyle = "lightblue";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
     const background = new Sprite({
       position: { x: -200, y: 0 },
@@ -50,37 +57,36 @@ export default function CanvasComp() {
       height: CANVAS_HEIGHT,
       scaleX: 1,
       scaleY: 1.3,
-    })
+    });
 
-
-    let userPlayer = null
-    let enemyPlayer = null
+    let userPlayer = null;
+    let enemyPlayer = null;
 
     const animate = () => {
-      requestAnimationFrame(animate)
-      context.fillStyle = "lightblue"
-      context.fillRect(0, 0, canvas.width, canvas.height)
+      requestAnimationFrame(animate);
+      context.fillStyle = "lightblue";
+      context.fillRect(0, 0, canvas.width, canvas.height);
 
-      background.update(context)
+      background.update(context);
 
       if (userPlayer) {
-        userPlayer.update(context)
+        userPlayer.update(context);
 
-        userPlayer.velocity.x = 0
-        userPlayer.switchSprite("idle")
+        userPlayer.velocity.x = 0;
+        userPlayer.switchSprite("idle");
 
         if (keys.left.pressed && userPlayer.lastKey === "left") {
-          userPlayer.velocity.x = speedBoost? -6 - speedBoost : -6
-          userPlayer.switchSprite("run")
-          userPlayer.flip = true
+          userPlayer.velocity.x = speedBoost ? -6 - speedBoost : -6;
+          userPlayer.switchSprite("run");
+          userPlayer.flip = true;
         } else if (keys.right.pressed && userPlayer.lastKey === "right") {
-          userPlayer.velocity.x = speedBoost? 6 + speedBoost : 6
-          userPlayer.switchSprite("run")
-          userPlayer.flip = false
+          userPlayer.velocity.x = speedBoost ? 6 + speedBoost : 6;
+          userPlayer.switchSprite("run");
+          userPlayer.flip = false;
         }
 
         if (userPlayer.velocity.y < 0) {
-          userPlayer.switchSprite("jump")
+          userPlayer.switchSprite("jump");
         }
 
         socket.current.emit("update-player", {
@@ -89,54 +95,55 @@ export default function CanvasComp() {
           health: userPlayer.health,
           isAttacking: userPlayer.isAttacking,
           flip: userPlayer.flip,
-          attackPower: userPlayer.attackPower
-        })
+          attackPower: userPlayer.attackPower,
+        });
       }
 
-    if (flashTimer.current > 0) {
-      const gradient = context.createRadialGradient(
-        canvas.width / 2,
-        canvas.height / 2,
-        100,
-        canvas.width / 2,
-        canvas.height / 2,
-        Math.max(canvas.width, canvas.height) / 1.2
-      )
+      if (flashTimer.current > 0) {
+        const gradient = context.createRadialGradient(
+          canvas.width / 2,
+          canvas.height / 2,
+          100,
+          canvas.width / 2,
+          canvas.height / 2,
+          Math.max(canvas.width, canvas.height) / 1.2
+        );
 
-      gradient.addColorStop(0, "rgba(255, 0, 0, 0)")
-      gradient.addColorStop(0.7, "rgba(255, 0, 0, 0.4)")
-      gradient.addColorStop(1, "rgba(255, 0, 0, 0.5)")
+        gradient.addColorStop(0, "rgba(255, 0, 0, 0)");
+        gradient.addColorStop(0.7, "rgba(255, 0, 0, 0.4)");
+        gradient.addColorStop(1, "rgba(255, 0, 0, 0.5)");
 
-      context.fillStyle = gradient
-      context.fillRect(0, 0, canvas.width, canvas.height)
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
 
-      flashTimer.current--
-    }
+        flashTimer.current--;
+      }
 
       if (enemyPlayer) {
-        enemyPlayer.update(context)
+        enemyPlayer.update(context);
       }
-    }
+    };
 
     socket.current.on("init", ({ role, position }) => {
-      setPlayerNumber(role)
+      setPlayerNumber(role);
       userPlayer = new Player({
         position: position,
         velocity: { x: 0, y: 0 },
         color: role === "player1" ? "blue" : "red",
         canvasHeight: CANVAS_HEIGHT,
         start: role === "player1" ? "left" : "right",
-        attackPower: healthBoost? 10 + healthBoost: 10,
+        attackPower: healthBoost ? 10 + healthBoost : 10,
         health: 100,
         canvasWidth: CANVAS_WIDTH,
         scaleX: 5,
         scaleY: 0.6,
         imageSource: role === "player1" ? hoodie : hoodie2,
-        jump: jumpBoost? -14 - jumpBoost: -14,
-      })
-    })
+        jump: jumpBoost ? -14 - jumpBoost : -14,
+        name: user.name,
+      });
+    });
 
-    socket.current.on("player-joined", ({ role, position }) => {
+    socket.current.on("player-joined", ({ role, position, username }) => {
       enemyPlayer = new Player({
         position,
         velocity: { x: 0, y: 0 },
@@ -150,8 +157,10 @@ export default function CanvasComp() {
         scaleY: 0.6,
         imageSource: role === "player1" ? hoodie : hoodie2,
         jump: -14,
-      })
-    })
+      });
+
+      setEnemyName(username || "Guest");
+    });
 
     socket.current.on("update-opponent", ({ data }) => {
       if (!enemyPlayer) return;
@@ -161,10 +170,8 @@ export default function CanvasComp() {
       enemyPlayer.health = data.health;
       enemyPlayer.flip = data.flip;
       enemyPlayer.isAttacking = data.isAttacking;
-      enemyPlayer.attackPower = data.attackPower
+      enemyPlayer.attackPower = data.attackPower;
       setEnemyHealth(data.health);
-
-      enemyPlayer.velocity.x = data.velocity.x;
 
       if (enemyPlayer.velocity.y < 0) {
         enemyPlayer.switchSprite("jump");
@@ -178,7 +185,6 @@ export default function CanvasComp() {
         enemyPlayer.switchSprite("idle");
       }
     });
-
 
     socket.current.on("opponent-attack", ({ attackBox, enemyData }) => {
       if (!userPlayer) return;
@@ -197,10 +203,10 @@ export default function CanvasComp() {
       const attackH = attackBox.height;
 
       const horizontallyAligned =
-        (enemyData.lastKey === 'right' &&
+        (enemyData.lastKey === "right" &&
           attackX + attackW >= userX &&
           attackX <= userX + userW) ||
-        (enemyData.lastKey === 'left' &&
+        (enemyData.lastKey === "left" &&
           attackX >= userX &&
           attackX - attackW / 2 <= userX + userW);
 
@@ -209,33 +215,36 @@ export default function CanvasComp() {
         attackY <= userY + userH;
 
       if (horizontallyAligned && verticallyAligned && enemyData.isAttacking) {
-        userPlayer.health = Math.max(userPlayer.health - enemyPlayer.attackPower, 0)
+        userPlayer.health = Math.max(
+          userPlayer.health - enemyPlayer.attackPower,
+          0
+        );
         setUserHealth(userPlayer.health);
-        flashTimer.current = 10
+        flashTimer.current = 10;
       }
     });
 
-    animate()
+    animate();
 
-    const handleKeyDown = e => {
-      if (!userPlayer) return
+    const handleKeyDown = (e) => {
+      if (!userPlayer) return;
       switch (e.key) {
         case "ArrowLeft":
-          keys.left.pressed = true
-          userPlayer.lastKey = "left"
-          break
+          keys.left.pressed = true;
+          userPlayer.lastKey = "left";
+          break;
         case "ArrowRight":
-          keys.right.pressed = true
-          userPlayer.lastKey = "right"
-          break
+          keys.right.pressed = true;
+          userPlayer.lastKey = "right";
+          break;
         case "ArrowUp":
           if (!userPlayer.jumping) {
-            userPlayer.velocity.y = userPlayer.jump
-            userPlayer.jumping = true
+            userPlayer.velocity.y = userPlayer.jump;
+            userPlayer.jumping = true;
           }
-          break
+          break;
         case " ":
-          userPlayer.attack()
+          userPlayer.attack();
           socket.current.emit("player-attack", {
             attackBox: {
               x: userPlayer.attackBox.position.x,
@@ -250,46 +259,63 @@ export default function CanvasComp() {
               width: userPlayer.width,
               height: userPlayer.height,
               attackBox: userPlayer.attackBox,
-            }
-          })
-          break
+            },
+          });
+          break;
       }
-    }
+    };
 
-    const handleKeyUp = e => {
+    const handleKeyUp = (e) => {
       switch (e.key) {
         case "ArrowLeft":
-          keys.left.pressed = false
-          break
+          keys.left.pressed = false;
+          break;
         case "ArrowRight":
-          keys.right.pressed = false
-          break
+          keys.right.pressed = false;
+          break;
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    window.addEventListener("keyup", handleKeyUp)
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      window.removeEventListener("keyup", handleKeyUp)
-      socket.current.off("init")
-      socket.current.off("player-joined")
-      socket.current.off("update-opponent")
-      socket.current.off("opponent-attack")
-    }
-  }, [])
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      socket.current.off("init");
+      socket.current.off("player-joined");
+      socket.current.off("update-opponent");
+      socket.current.off("opponent-attack");
+    };
+  }, []);
 
   if (gameState) {
     return (
       <div className="gameContainer">
         <header className="scoreBoard">
-          <div><h1>{playerNumber == 'player1'? userHealth: enemyHealth}</h1></div>
-          <div><h1>{playerNumber == 'player2'? userHealth: enemyHealth}</h1></div>
+          <div>
+            <h3>{playerNumber === "player1" ? user.name : enemyName}</h3>
+            <progress
+              style={{ height: "100px", width: "500px" }}
+              className="nes-progress is-success"
+              value={playerNumber === "player1" ? userHealth : enemyHealth}
+              max="100"
+            ></progress>
+          </div>
+
+          <div>
+            <h3>{playerNumber === "player2" ? user.name : enemyName}</h3>
+            <progress
+              style={{ height: "100px", width: "500px" }}
+              className="nes-progress is-success"
+              value={playerNumber === "player2" ? userHealth : enemyHealth}
+              max="100"
+            ></progress>
+          </div>
         </header>
         <canvas ref={canvasRef}></canvas>
       </div>
-    )
+    );
   }
 
   return (
@@ -297,5 +323,5 @@ export default function CanvasComp() {
       <h1>GAME OVER</h1>
       <h2>{winner}</h2>
     </div>
-  )
+  );
 }
