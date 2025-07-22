@@ -101,9 +101,6 @@ const start = async () => {
     server.listen(SOCKETPORT, '0.0.0.0', () => {
       console.log(`Socket is listening on port ${SOCKETPORT}...`);
     });
-    app.listen(SOCKETPORT, () =>
-      console.log(`Server is listening on port ${SERVERPORT}...`)
-    );
   } catch (error) {
     console.log(error);
   }
