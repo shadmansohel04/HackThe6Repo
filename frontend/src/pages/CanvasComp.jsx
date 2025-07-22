@@ -26,7 +26,7 @@ export default function CanvasComp() {
   const [waiting, setWaiting] = useState(true);
 
   useEffect(() => {
-    const tempSocket = io("http://10.33.41.210:3000", {
+    const tempSocket = io(`${import.meta.env.VITE_SOCKET}`, {
       auth: {
         username: user?.name || "Guest"
       }

@@ -8,11 +8,11 @@ const root = createRoot(document.getElementById('root'));
 
 root.render(
   <Auth0Provider
-    domain="dev-abm2ro6war776xmm.us.auth0.com"
-    clientId="Yum35S29OVPLsGTzSCj4TJFFfEtfPwct"
+    domain={import.meta.env.VITE_AUTH0_DOMAINCHECK}
+    clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
     authorizationParams={{
-      redirect_uri: 'http://localhost:5173/userDash',
-      audience: "https://dev-abm2ro6war776xmm.us.auth0.com/api/v2/"
+      redirect_uri: import.meta.env.VITE_AUTH0_REDIRECT_URI,
+      audience: import.meta.env.VITE_AUTH0_AUDIENCE
     }}
     cacheLocation="localstorage"
 

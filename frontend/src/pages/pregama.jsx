@@ -13,7 +13,7 @@ export default function PregameComp() {
     const fetcher = async () => {
       try {
         const token = await getAccessTokenSilently();
-        const raw = await fetch("http://10.33.41.210:8000/home/getRecipes", {
+        const raw = await fetch(`${import.meta.env.VITE_BACKENDURI}/home/getRecipes`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

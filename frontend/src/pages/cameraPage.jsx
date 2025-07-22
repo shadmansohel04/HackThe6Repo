@@ -43,7 +43,7 @@ export default function CameraPage() {
             formData.append("foodImage", blob, "food.png");
 
             const token = await getAccessTokenSilently();
-            const raw = await fetch("http://10.33.41.210:8000/home/uploadFood", {
+            const raw = await fetch(`${import.meta.env.VITE_BACKENDURI}/home/uploadFood`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`
