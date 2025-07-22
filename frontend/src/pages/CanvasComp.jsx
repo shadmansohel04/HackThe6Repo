@@ -350,6 +350,7 @@ export default function CanvasComp() {
     <div className="gameOverScreen">
       <h1 style={{color: 'white', fontSize: '9rem', fontFamily: "Pixelify Sans, sans-serif"}}>GAME OVER</h1>
       <h2 style={{color: 'white', fontSize: '5rem', fontFamily: "Pixelify Sans, sans-serif"}}>{winner}</h2>
+      <a style={{color: 'white', textDecoration: 'none'}} href="https://hackthe6repo.onrender.com/userdash">Back to the Lobby</a>
     </div>
   );
 }
